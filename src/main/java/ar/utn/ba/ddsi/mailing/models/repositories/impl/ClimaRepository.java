@@ -15,15 +15,10 @@ public class ClimaRepository implements IClimaRepository {
     @Override
     public Clima save(Clima clima) {
         if (clima.getId() == null) {
-            Long id = idGenerator.getAndIncrement();
-            clima.setId(id);
-            climas.put(id, clima);
-            ciudadToId.put(clima.getCiudad(), id);
+            return this.create(clima);
         } else {
-            climas.put(clima.getId(), clima);
-            ciudadToId.put(clima.getCiudad(), clima.getId());
+            return this.update(clima);
         }
-        return clima;
     }
 
     @Override
@@ -55,5 +50,21 @@ public class ClimaRepository implements IClimaRepository {
             climas.remove(clima.getId());
             ciudadToId.remove(clima.getCiudad());
         }
+    }
+
+    private Clima create(Clima clima) {
+        Long id = idGenerator.getAndIncrement();
+        clima.setId(id);
+        climas.put(id, clima);
+        ciudadToId.put(clima.getCiudad(), id);
+
+        return clima;
+    }
+
+    private Clima update(Clima clima) {
+        climas.put(clima.getId(), clima);
+        ciudadToId.put(clima.getCiudad(), clima.getId());
+
+        return clima;
     }
 } 

@@ -1,15 +1,15 @@
-package ar.utn.ba.ddsi.mailing.models.entities;
+package ar.utn.ba.ddsi.mailing.models.DTO.Input;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
-@Getter
-@Setter
-@Builder
+@Data
 @AllArgsConstructor
-public class Clima {
-    private Long id;
+@NoArgsConstructor
+@Builder
+public class ClimaInputDTO {
     private String ciudad;
     private String region;
     private String pais;
@@ -18,6 +18,4 @@ public class Clima {
     private String condicion;
     private Double velocidadVientoKmh;
     private Integer humedad;
-    private LocalDateTime fechaActualizacion;
-    private boolean procesado;
 }

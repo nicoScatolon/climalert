@@ -1,8 +1,9 @@
 package ar.utn.ba.ddsi.mailing.services.impl;
 
+import ar.utn.ba.ddsi.mailing.models.DTO.Input.ClimaInputDTO;
 import ar.utn.ba.ddsi.mailing.models.entities.Clima;
 import ar.utn.ba.ddsi.mailing.models.repositories.IClimaRepository;
-import ar.utn.ba.ddsi.mailing.models.dto.external.weatherapi.WeatherResponse;
+import ar.utn.ba.ddsi.mailing.models.DTO.Input.Weatherapi.WeatherResponse;
 import ar.utn.ba.ddsi.mailing.services.IClimaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
 
 @Service
 public class ClimaService implements IClimaService {
@@ -40,7 +43,7 @@ public class ClimaService implements IClimaService {
         return Flux.fromArray(CIUDADES_ARGENTINA)
             .flatMap(this::obtenerClimaDeAPI)
             .flatMap(clima -> {
-                climaRepository.save(clima);
+                climaRepository.save(convertirClima(clima));
                 logger.info("Clima actualizado para: {}", clima.getCiudad());
                 return Mono.empty();
             })
@@ -51,7 +54,7 @@ public class ClimaService implements IClimaService {
             .then();
     }
 
-    private Mono<Clima> obtenerClimaDeAPI(String ciudad) {
+    private Mono<ClimaInputDTO> obtenerClimaDeAPI(String ciudad) {
         return webClient.get()
             .uri(uriBuilder -> uriBuilder
                 .path("/current.json")
@@ -61,17 +64,34 @@ public class ClimaService implements IClimaService {
                 .build())
             .retrieve()
             .bodyToMono(WeatherResponse.class)
-            .map(response -> {
-                Clima clima = new Clima();
-                clima.setCiudad(ciudad);
-                clima.setRegion(response.getLocation().getRegion());
-                clima.setPais(response.getLocation().getCountry());
-                clima.setTemperaturaCelsius(response.getCurrent().getTemp_c());
-                clima.setTemperaturaFahrenheit(response.getCurrent().getTemp_f());
-                clima.setCondicion(response.getCurrent().getCondition().getText());
-                clima.setVelocidadVientoKmh(response.getCurrent().getWind_kph());
-                clima.setHumedad(response.getCurrent().getHumidity());
-                return clima;
-            });
+            .map(response -> this.obtenerClimaCiudad(response, ciudad));
+    }
+
+    private ClimaInputDTO obtenerClimaCiudad(WeatherResponse response,String ciudad) {
+        return ClimaInputDTO.builder()
+                .ciudad(ciudad)
+                .region(response.getLocation().getRegion())
+                .pais(response.getLocation().getCountry())
+                .temperaturaCelsius(response.getCurrent().getTemp_c())
+                .temperaturaFahrenheit(response.getCurrent().getTemp_f())
+                .condicion(response.getCurrent().getCondition().getText())
+                .velocidadVientoKmh(response.getCurrent().getWind_kph())
+                .humedad(response.getCurrent().getHumidity())
+                .build();
+    }
+
+    private Clima convertirClima(ClimaInputDTO climaDTO) {
+        return Clima.builder()
+                .ciudad(climaDTO.getCiudad())
+                .region(climaDTO.getRegion())
+                .pais(climaDTO.getPais())
+                .temperaturaCelsius(climaDTO.getTemperaturaCelsius())
+                .temperaturaFahrenheit(climaDTO.getTemperaturaFahrenheit())
+                .condicion(climaDTO.getCondicion())
+                .velocidadVientoKmh(climaDTO.getVelocidadVientoKmh())
+                .humedad(climaDTO.getHumedad())
+                .fechaActualizacion(LocalDateTime.now())
+                .procesado(false)
+                .build();
     }
 } 

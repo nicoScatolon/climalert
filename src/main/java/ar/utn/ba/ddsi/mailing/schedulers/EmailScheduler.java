@@ -12,12 +12,12 @@ public class EmailScheduler {
         this.emailService = emailService;
     }
 
-    @Scheduled(cron = "${cron.expression}")
+    @Scheduled(cron = "${cron.1min}")
     public void procesarEmailsPendientes() {
         emailService.procesarPendientes();
     }
 
-    @Scheduled(cron = "${cron.expression}")
+    @Scheduled(cron = "${cron.1min}")
     public void loguearEmailsPendientes() {
         emailService.loguearEmailsPendientes();
     }

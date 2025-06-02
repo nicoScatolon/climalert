@@ -15,8 +15,8 @@ public class ClimaScheduler {
         this.climaService = climaService;
     }
 
-    @Scheduled(fixedRate = 300000) // 300000 ms = 5 minutos
-    public void actualizarClima() {
+    @Scheduled(cron = "${cron.5min}")
+    public void actualizarClima() { //Es asincrono
         climaService.actualizarClimaCiudades()
             .doOnSuccess(v -> logger.info("Actualización de clima completada"))
             .doOnError(e -> logger.error("Error en la actualización de clima: {}", e.getMessage()))

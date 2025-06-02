@@ -15,7 +15,7 @@ public class AlertasScheduler {
         this.alertasService = alertasService;
     }
 
-    @Scheduled(fixedRate = 60000) // Cada 1 minuto
+    @Scheduled(cron = "${cron.1min}")
     public void procesarAlertas() {
         alertasService.generarAlertasYAvisar()
             .doOnSuccess(v -> logger.info("Procesamiento de alertas completado"))

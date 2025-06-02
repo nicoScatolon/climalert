@@ -1,10 +1,12 @@
 package ar.utn.ba.ddsi.mailing.models.entities;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Setter
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Email {
     private Long id;
     private String destinatario;

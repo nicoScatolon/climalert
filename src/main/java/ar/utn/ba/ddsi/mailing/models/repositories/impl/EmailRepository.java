@@ -14,15 +14,10 @@ public class EmailRepository implements IEmailRepository {
     @Override
     public Email save(Email email) {
         if (email.getId() == null) {
-            // Es un nuevo email
-            Long id = idGenerator.getAndIncrement();
-            email.setId(id);
-            emails.put(id, email);
+            return this.create(email);
         } else {
-            // Es una actualización
-            emails.put(email.getId(), email);
+            return this.update(email);
         }
-        return email;
     }
 
     @Override
@@ -47,5 +42,17 @@ public class EmailRepository implements IEmailRepository {
         if (email.getId() != null) {
             emails.remove(email.getId());
         }
+    }
+
+    private Email create(Email email) {
+        Long id = idGenerator.getAndIncrement();
+        email.setId(id);
+        emails.put(id, email);
+        return email;
+    }
+
+    private Email update(Email email) {
+        emails.put(email.getId(), email);
+        return email;
     }
 } 
